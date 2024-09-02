@@ -13,12 +13,17 @@
 
     <script>
         // Establish a WebSocket connection
-        const websocket = new WebSocket('ws://' + 'http://127.0.0.1:8000' + '/ws/esp32/');
+        const websocket = new WebSocket('ws://127.0.0.1:8000/ws/esp32/');
 
         // Handle incoming messages
         websocket.onmessage = function(event) {
             const data = JSON.parse(event.data);
             console.log(data);
+        };
+
+        // Handle errors
+        websocket.onerror = function(event) {
+            console.error('WebSocket error observed:', event);
         };
 
         // Handle form submission
