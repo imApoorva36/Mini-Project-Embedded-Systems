@@ -1,0 +1,12 @@
+# Django and related packages
+Django>=4.2,<5.0
+djangorestframework>=3.14,<4.0
+
+# Flake8 for code linting
+flake8>=6.0,<7.0
+
+# For other potential needs:
+# WebSocket support
+channels>=4.0,<5.0
+# If you use Redis as a channel layer
+channels-redis>=4.0,<5.0
