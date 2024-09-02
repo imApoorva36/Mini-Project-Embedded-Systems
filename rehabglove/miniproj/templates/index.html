@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket with ESP32</title>
+</head>
+<body>
+    <h1>Enter XYZ Data</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Send</button>
+    </form>
+
+    <script>
+        // Establish a WebSocket connection
+        const websocket = new WebSocket('ws://' + window.location.host + '/ws/esp32/');
+
+        // Handle incoming messages
+        websocket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            console.log(data);
+        };
+
+        // Handle form submission
+        const form = document.querySelector('form');
+        form.onsubmit = function(event) {
+            event.preventDefault();
+            const x = document.querySelector('[name="x"]').value;
+            const y = document.querySelector('[name="y"]').value;
+            const z = document.querySelector('[name="z"]').value;
+            websocket.send(JSON.stringify({ 'x': x, 'y': y, 'z': z }));
+        };
+    </script>
+</body>
+</html>
