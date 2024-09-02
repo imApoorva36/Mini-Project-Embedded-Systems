@@ -17,4 +17,8 @@ class ESP32Consumer(AsyncWebsocketConsumer):
 
         # Here, add logic to handle the data, such as sending it to the ESP32
 
-        await self.send(text_data=json.dumps({"status": "Data received"}))
+        await self.send(
+            text_data=json.dumps(
+                [{"status": "Data received"}, {"average": (x + y + z) / 3}]
+            )
+        )

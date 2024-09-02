@@ -1,0 +1,33 @@
+# Django-specific files
+.DS_Store
+*.pyc
+*.pyo
+__pycache__/
+.pytest_cache/
+
+# Django-specific directories
+media/
+static/
+db.sqlite3
+
+# Third-party libraries
+node_modules/
+
+# Temporary files and directories
+*.swp
+*.bak
+*.tmp
+*.log
+*.pid
+*.sock
+
+# IDE-specific files
+.idea/
+.vscode/
+*.suo
+*.user
+*.sln
+
+# Other
+*.git
+*.svn
