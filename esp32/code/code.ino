@@ -6,33 +6,33 @@ const char *password = "your_PASSWORD";
 
 WebSocketsServer webSocket = WebSocketsServer(81);
 
+void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
+{
+  if (type == WStype_TEXT)
+  {
+    String message = String((char *)payload);
+    Serial.println("Received: " + message);
+    webSocket.sendTXT(num, "Message received");
+  }
+}
+
 void setup()
 {
-    Serial.begin(115200);
-    WiFi.begin(ssid, password);
+  Serial.begin(115200);
+  WiFi.begin(ssid, password);
 
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(1000);
-        Serial.println("Connecting to WiFi...");
-    }
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(1000);
+    Serial.print(".");
+  }
+  Serial.println("Connected to WiFi");
 
-    Serial.println("Connected to WiFi");
-
-    webSocket.begin();
-    webSocket.onEvent(webSocketEvent);
+  webSocket.begin();
+  webSocket.onEvent(onWebSocketEvent);
 }
 
 void loop()
 {
-    webSocket.loop();
-}
-
-void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
-{
-    if (type == WStype_TEXT)
-    {
-        Serial.printf("[%u] Received: %s\n", num, payload);
-        // Handle the received data here
-    }
+  webSocket.loop();
 }
