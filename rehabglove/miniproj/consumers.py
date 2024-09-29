@@ -1,20 +1,28 @@
 import json
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import WebsocketConsumer
 
 
-class ESP32Consumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        await self.accept()
+class ESP32Consumer(WebsocketConsumer):
+    def connect(self):
+        self.accept()
 
-    async def disconnect(self, close_code):
+    def disconnect(self, close_code):
         pass
 
-    async def receive(self, text_data):
+    def receive(self, text_data):
         data = json.loads(text_data)
-        x = data["x"]
-        y = data["y"]
-        z = data["z"]
+        # Handle the data received from the WebSocket (e.g., ESP32 data)
+        # Example:
+        target_angle = data.get("targetAngle")
+        assisted_angle = data.get("assistedAngle")
 
-        # Here, add logic to handle the data, such as sending it to the ESP32
-
-        await self.send(text_data=json.dumps({"message": "Data received"}))
+        # You can send data back to the WebSocket
+        self.send(
+            text_data=json.dumps(
+                {
+                    "response": "Data received!",
+                    "targetAngle": target_angle,
+                    "assistedAngle": assisted_angle,
+                }
+            )
+        )

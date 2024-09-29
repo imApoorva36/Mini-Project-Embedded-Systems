@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rehabilitation Glove Control</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS (optional for additional styling) -->
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Rehabilitation Glove</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Control the Rehabilitation Glove</h1>
+        
+        <form id="controlForm" method="POST">
+            {% csrf_token %}
+            
+            <h2 class="mb-3 text-center">Set Target and Assisted Angles</h2>
+            
+            <!-- Input fields for each finger arranged in rows with 3 columns -->
+            <div class="row mb-10">
+                {% for i in "01234"|make_list %}
+                    <div class="col-md-4 py-3">
+                        <div class="mb-3">
+                            <label for="targetAngle{{ i }}" class="form-label">Finger {{ i|add:"1" }} Target Angle:</label>
+                            <input type="number" id="targetAngle{{ i }}" name="targetAngle{{ i }}" class="form-control" min="0" max="180" placeholder="Enter target angle">
+                        </div>
+                        
+                        <div class="mb-3 ">
+                            <label for="assistedAngle{{ i }}" class="form-label">Finger {{ i|add:"1" }} Assisted Angle:</label>
+                            <input type="number" id="assistedAngle{{ i }}" name="assistedAngle{{ i }}" class="form-control" min="0" max="180" placeholder="Enter assisted angle">
+                        </div>
+                    </div>
+                    
+                    <!-- Close the row after every 3 items -->
+                    {% if forloop.counter|divisibleby:"3" and not forloop.last %}
+                        </div><div class="row">
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary mt-3">Send</button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Bootstrap JS (for functionality) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const form = document.getElementById('controlForm');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const targetAngle = [];
+            const assistedAngle = [];
+            
+            for (let i = 0; i < 5; i++) {
+                targetAngle.push(document.getElementById(`targetAngle${i}`).value);
+                assistedAngle.push(document.getElementById(`assistedAngle${i}`).value);
+            }
+            
+            const ws = new WebSocket('ws://localhost:8000/ws/esp32/');
+            ws.onopen = () => {
+                ws.send(JSON.stringify({
+                    'targetAngle': targetAngle,
+                    'assistedAngle': assistedAngle
+                }));
+            };
+            ws.onmessage = (event) => {
+                console.log("Received from server:", event.data);
+            };
+        });
+    </script>
+</body>
+</html>
