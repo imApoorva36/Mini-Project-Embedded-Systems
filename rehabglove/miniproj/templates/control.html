@@ -58,11 +58,13 @@
     <!-- Bootstrap JS (for functionality) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- JavaScript to send form data via WebSocket -->
     <script>
         const form = document.getElementById('controlForm');
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             
+            // Collect target and assisted angles for each finger
             const targetAngle = [];
             const assistedAngle = [];
             
@@ -71,15 +73,18 @@
                 assistedAngle.push(document.getElementById(`assistedAngle${i}`).value);
             }
             
+            // Send the data to the ESP32 via WebSocket
             const ws = new WebSocket('ws://localhost:8000/ws/esp32/');
             ws.onopen = () => {
+                // Send both target and assisted angles
                 ws.send(JSON.stringify({
                     'targetAngle': targetAngle,
                     'assistedAngle': assistedAngle
                 }));
             };
+
             ws.onmessage = (event) => {
-                console.log("Received from server:", event.data);
+                console.log("Received from ESP32:", event.data);
             };
         });
     </script>
