@@ -17,12 +17,12 @@ float thresholdChange = 5;               // Change threshold for activation
 bool assistActive[numFingers] = {false}; // Whether assist is active for each finger
 
 // WiFi configuration
-const char *ssid = "your_SSID";         // Replace with your WiFi SSID
-const char *password = "your_PASSWORD"; // Replace with your WiFi password
+const char *ssid = "Pixelme";         // Replace with your WiFi SSID
+const char *password = "12345678"; // Replace with your WiFi password
 
 // WebSocket server configuration
-const char *webSocketServerHost = "your.server.com"; // Replace with your server IP or hostname
-const int webSocketServerPort = 81;                  // WebSocket server port
+const char *webSocketServerHost = "https://mini-project-embedded-systems.onrender.com/"; // Replace with your server IP or hostname
+const int webSocketServerPort = 8000;                  // WebSocket server port
 
 // State variables for previous angles and check timing
 float previousAngle[numFingers] = {0};
