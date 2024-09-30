@@ -46,16 +46,17 @@ The smart rehabilitation glove is equipped with flex sensors and actuators contr
 
    - Navigate to the Django project folder:
      ```bash
-     cd rehabglove/minniproj
+     cd rehabglove
      ```
    - Create a virtual environment and install dependencies:
      ```bash
      python -m venv env
      source env/bin/activate  # On Windows use `env\Scripts\activate`
-     pip install -r requirements.txt
+     pip install -r ../requirements.txt
      ```
    - Run the Django server:
      ```bash
+     python manage.py makemigrations
      python manage.py migrate
      python manage.py runserver
      ```
