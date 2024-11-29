@@ -1,92 +1,93 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rehabilitation Glove Control</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Custom CSS (optional for additional styling) -->
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <title>Control Arduino via WebSocket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        input[type="number"] {
+            width: 100px;
+            padding: 5px;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .status {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        .connected {
+            color: green;
+        }
+        .disconnected {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Rehabilitation Glove</a>
-        </div>
-    </nav>
+    <h1>Arduino WebSocket Control</h1>
+    <label for="threshold">Threshold:</label>
+    <input type="number" id="threshold" value="100" min="0" step="1">
+    <button onclick="updateThreshold()">Update Threshold</button>
 
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Control the Rehabilitation Glove</h1>
-        
-        <form id="controlForm" method="POST">
-            {% csrf_token %}
-            
-            <h2 class="mb-3 text-center">Set Target and Assisted Angles</h2>
-            
-            <!-- Input fields for each finger arranged in rows with 3 columns -->
-            <div class="row mb-10">
-                {% for i in "01234"|make_list %}
-                    <div class="col-md-4 py-3">
-                        <div class="mb-3">
-                            <label for="targetAngle{{ i }}" class="form-label">Finger {{ i|add:"1" }} Target Angle:</label>
-                            <input type="number" id="targetAngle{{ i }}" name="targetAngle{{ i }}" class="form-control" min="0" max="180" placeholder="Enter target angle">
-                        </div>
-                        
-                        <div class="mb-3 ">
-                            <label for="assistedAngle{{ i }}" class="form-label">Finger {{ i|add:"1" }} Assisted Angle:</label>
-                            <input type="number" id="assistedAngle{{ i }}" name="assistedAngle{{ i }}" class="form-control" min="0" max="180" placeholder="Enter assisted angle">
-                        </div>
-                    </div>
-                    
-                    <!-- Close the row after every 3 items -->
-                    {% if forloop.counter|divisibleby:"3" and not forloop.last %}
-                        </div><div class="row">
-                    {% endif %}
-                {% endfor %}
-            </div>
+    <div class="status" id="status">Connecting...</div>
 
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary mt-3">Send</button>
-            </div>
-        </form>
-    </div>
-    
-    <!-- Bootstrap JS (for functionality) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <h3>Current Threshold: <span id="current-threshold">100</span></h3>
 
-    <!-- JavaScript to send form data via WebSocket -->
     <script>
-        const form = document.getElementById('controlForm');
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            // Collect target and assisted angles for each finger
-            const targetAngle = [];
-            const assistedAngle = [];
-            
-            for (let i = 0; i < 5; i++) {
-                targetAngle.push(document.getElementById(`targetAngle${i}`).value);
-                assistedAngle.push(document.getElementById(`assistedAngle${i}`).value);
-            }
-            
-            // Send the data to the ESP32 via WebSocket
-            const ws = new WebSocket('ws://localhost:8000/ws/esp32/');
-            ws.onopen = () => {
-                // Send both target and assisted angles
-                ws.send(JSON.stringify({
-                    'targetAngle': targetAngle,
-                    'assistedAngle': assistedAngle
-                }));
-            };
+        // Replace this with the correct local IP address of your Django server
+        var ws = new WebSocket("ws://192.168.250.150:8000/ws/arduino/");
 
-            ws.onmessage = (event) => {
-                console.log("Received from ESP32:", event.data);
-            };
-        });
+        // Update WebSocket connection status
+        ws.onopen = function() {
+            document.getElementById("status").textContent = "Connected to WebSocket!";
+            document.getElementById("status").classList.remove('disconnected');
+            document.getElementById("status").classList.add('connected');
+        };
+
+        ws.onclose = function() {
+            document.getElementById("status").textContent = "Disconnected from WebSocket!";
+            document.getElementById("status").classList.remove('connected');
+            document.getElementById("status").classList.add('disconnected');
+        };
+
+        ws.onerror = function() {
+            document.getElementById("status").textContent = "WebSocket Error!";
+            document.getElementById("status").classList.remove('connected');
+            document.getElementById("status").classList.add('disconnected');
+        };
+
+        // Receive the threshold data from the WebSocket
+        ws.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+            if (data.threshold) {
+                document.getElementById("current-threshold").textContent = data.threshold;
+            }
+        };
+
+        // Send the updated threshold to the WebSocket
+        function updateThreshold() {
+            var thresholdValue = document.getElementById("threshold").value;
+            ws.send(JSON.stringify({
+                'threshold': thresholdValue
+            }));
+        }
     </script>
 </body>
 </html>

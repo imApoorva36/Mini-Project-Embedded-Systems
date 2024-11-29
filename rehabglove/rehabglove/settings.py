@@ -76,6 +76,17 @@ TEMPLATES = [
 WSGI_APPLICATION = "rehabglove.wsgi.application"
 ASGI_APPLICATION = "rehabglove.asgi.application"  # Channels ASGI config
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                ("127.0.0.1", 6379)
+            ],  # Adjust the host and port for your Redis instance
+        },
+    },
+}
+
 # Database (using SQLite)
 DATABASES = {
     "default": {

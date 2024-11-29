@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card h2 {
+            font-size: 1.5rem;
+            color: #34495e;
+        }
+        select, input[type="number"], button {
+            width: 100%;
+            max-width: 300px;
+            margin: 10px auto;
+            display: block;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .thresholds {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .threshold {
+            flex: 1;
+            margin: 10px;
+            text-align: center;
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .threshold h3 {
+            margin: 0;
+            color: #1565c0;
+        }
+        .threshold p {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 5px 0 0;
+        }
+        button {
+            background-color: #2196f3;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: #1e88e5;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #777;
+        }
+        .notification {
+            padding: 10px;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .notification.success {
+            background-color: #4caf50;
+        }
+        .notification.warning {
+            background-color: #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Rehab Glove - Patient Dashboard</h1>
+
+        <!-- Notifications -->
+        {% if notification %}
+        <div class="notification success">
+            {{ notification }}
+        </div>
+        {% endif %}
+
+        <!-- Unified form -->
+        <div class="card">
+            <h2>Manage Patient & Settings</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <label for="patient_id">Select Patient:</label>
+                <select name="patient_id" id="patient_id" onchange="this.form.submit()">
+                    {% for patient in patients %}
+                        <option value="{{ patient.id }}" {% if patient.id == selected_patient.id %}selected{% endif %}>
+                            {{ patient.name }} ({{ patient.patient_type }})
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label for="num_sets">Number of Sets:</label>
+                <input type="number" name="num_sets" id="num_sets" min="1" max="20" value="{{ selected_patient.num_sets }}">
+
+                <button type="submit" name="update_sets">Update Sets</button>
+            </form>
+        </div>
+
+        <!-- Patient details -->
+        <div class="card">
+            <h2>Patient Details</h2>
+            <p><strong>Name:</strong> {{ selected_patient.name }}</p>
+            <p><strong>Age:</strong> {{ selected_patient.age }}</p>
+            <p><strong>Gender:</strong> {{ selected_patient.gender }}</p>
+            <p><strong>Condition:</strong> {{ selected_patient.condition }}</p>
+            <p><strong>Doctor's Name:</strong> Dr. Andrew Miller</p>
+            <p><strong>Contact:</strong> +1-234-567-8901</p>
+            <p><strong>Physiotherapy Start Date:</strong> {{ selected_patient.last_updated }}</p>
+            <p><strong>Progress Notes:</strong> {{ selected_patient.sets_completed }} of {{ selected_patient.num_sets }} sets completed.</p>
+            <p><strong>Threshold:</strong> 
+                Thumb: {{ thresholds.thumb }}, 
+                Index: {{ thresholds.index }}, 
+                Middle: {{ thresholds.middle }},
+                Ring: {{ thresholds.ring }},
+                Pinky: {{ thresholds.pinky }}
+            </p>
+        </div>
+
+        <!-- Motor Controls -->
+        <div class="card">
+            <h2>Motor Controls</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <p>Current Motor Status: <strong>{{ motor_status }}</strong></p>
+                <button type="submit" name="start_motor">Start Motor</button>
+                <button type="submit" name="stop_motor">Stop Motor</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
