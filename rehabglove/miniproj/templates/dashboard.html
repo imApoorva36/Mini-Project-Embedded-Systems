@@ -45,6 +45,16 @@
             border-radius: 6px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        button {
+            background-color: #2196f3;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: #1e88e5;
+        }
         .thresholds {
             display: flex;
             justify-content: space-between;
@@ -69,15 +79,19 @@
             font-weight: bold;
             margin: 5px 0 0;
         }
-        button {
-            background-color: #2196f3;
-            color: #fff;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
+        .progress-bar {
+            position: relative;
+            height: 20px;
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
         }
-        button:hover {
-            background-color: #1e88e5;
+        .progress-bar > div {
+            height: 100%;
+            background-color: #76c7c0;
+            border-radius: 10px;
         }
         .footer {
             text-align: center;
@@ -116,6 +130,9 @@
             <h2>Manage Patient & Settings</h2>
             <form method="POST">
                 {% csrf_token %}
+                <!-- Hidden input to pass the current patient_id -->
+                <input type="hidden" name="patient_id" value="{{ selected_patient.id }}">
+
                 <label for="patient_id">Select Patient:</label>
                 <select name="patient_id" id="patient_id" onchange="this.form.submit()">
                     {% for patient in patients %}
@@ -139,17 +156,40 @@
             <p><strong>Age:</strong> {{ selected_patient.age }}</p>
             <p><strong>Gender:</strong> {{ selected_patient.gender }}</p>
             <p><strong>Condition:</strong> {{ selected_patient.condition }}</p>
-            <p><strong>Doctor's Name:</strong> Dr. Andrew Miller</p>
-            <p><strong>Contact:</strong> +1-234-567-8901</p>
-            <p><strong>Physiotherapy Start Date:</strong> {{ selected_patient.last_updated }}</p>
             <p><strong>Progress Notes:</strong> {{ selected_patient.sets_completed }} of {{ selected_patient.num_sets }} sets completed.</p>
-            <p><strong>Threshold:</strong> 
-                Thumb: {{ thresholds.thumb }}, 
-                Index: {{ thresholds.index }}, 
-                Middle: {{ thresholds.middle }},
-                Ring: {{ thresholds.ring }},
-                Pinky: {{ thresholds.pinky }}
-            </p>
+
+            <!-- Progress bar -->
+            <div class="progress-bar">
+                <div class="progress" style="width: {{ progress_percentage }}%; background-color: #4CAF50; height: 20px; border-radius: 5px;"></div>
+                <p style="margin-top: 5px;">{{ progress_percentage }}% Completed</p>
+            </div>
+        </div>
+
+        <!-- Threshold details -->
+        <div class="card">
+            <h2>Thresholds</h2>
+            <div class="thresholds">
+                <div class="threshold">
+                    <h3>Thumb</h3>
+                    <p>{{ thresholds.thumb }}</p>
+                </div>
+                <div class="threshold">
+                    <h3>Index</h3>
+                    <p>{{ thresholds.index }}</p>
+                </div>
+                <div class="threshold">
+                    <h3>Middle</h3>
+                    <p>{{ thresholds.middle }}</p>
+                </div>
+                <div class="threshold">
+                    <h3>Ring</h3>
+                    <p>{{ thresholds.ring }}</p>
+                </div>
+                <div class="threshold">
+                    <h3>Pinky</h3>
+                    <p>{{ thresholds.pinky }}</p>
+                </div>
+            </div>
         </div>
 
         <!-- Motor Controls -->

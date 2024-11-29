@@ -1,6 +1,6 @@
 # miniproj/views.py
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 
 def control_page(request):
@@ -8,6 +8,7 @@ def control_page(request):
 
 
 from django.shortcuts import render, redirect
+
 
 # Simulated patient data
 patients = [
@@ -86,6 +87,16 @@ def dashboard(request):
             motor_status = "Stopped"
             notification = f"Motor stopped for {selected_patient['name']}."
 
+    # Recalculate progress percentage
+    progress_percentage = (
+        0  # Default to 0 to handle division by zero or missing data
+    )
+    if selected_patient["num_sets"] > 0:  # Prevent division by zero
+        progress_percentage = int(
+            (selected_patient["sets_completed"] / selected_patient["num_sets"])
+            * 100
+        )
+
     return render(
         request,
         "dashboard.html",
@@ -95,5 +106,6 @@ def dashboard(request):
             "thresholds": thresholds,
             "notification": notification,
             "motor_status": motor_status,
+            "progress_percentage": progress_percentage,
         },
     )
