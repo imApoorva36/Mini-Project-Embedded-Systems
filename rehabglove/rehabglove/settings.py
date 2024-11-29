@@ -34,7 +34,7 @@ ALLOWED_HOSTS = [
     "192.168.250.150",  # IP of your server
     "localhost",  # Add localhost too
     "127.0.0.1",
-    "https://mini-project-embedded-systems.onrender.com",
+    "mini-project-embedded-systems.onrender.com",
 ]
 
 # WebSockets settings (This part should already be fine in your current code)
