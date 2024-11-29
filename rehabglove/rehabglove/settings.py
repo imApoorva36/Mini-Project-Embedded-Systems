@@ -26,11 +26,18 @@ SECRET_KEY = (
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+CORS_ORIGIN_ALLOW_ALL = (
+    True  # If you're allowing cross-origin requests, enable this.
+)
+
 ALLOWED_HOSTS = [
-    "mini-project-embedded-systems.onrender.com",
-    "localhost",
+    "192.168.250.150",  # IP of your server
+    "localhost",  # Add localhost too
     "127.0.0.1",
 ]
+
+# WebSockets settings (This part should already be fine in your current code)
+ASGI_APPLICATION = "rehabglove.asgi.application"  # ASGI app for Channels
 
 
 # Application definition
@@ -43,6 +50,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "miniproj",  # Your app
     "channels",  # Channels for WebSockets
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -53,6 +61,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "rehabglove.urls"
@@ -73,19 +82,34 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "rehabglove.wsgi.application"
-ASGI_APPLICATION = "rehabglove.asgi.application"  # Channels ASGI config
+# WSGI_APPLICATION = "rehabglove.wsgi.application"
+# ASGI_APPLICATION = "rehabglove.asgi.application"  # Channels ASGI config
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [
+#                 ("127.0.0.1", 6379)
+#             ],  # Adjust the host and port for your Redis instance
+#         },
+#     },
+# }
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [
-                ("127.0.0.1", 6379)
-            ],  # Adjust the host and port for your Redis instance
-        },
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # In-memory layer
     },
 }
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer",
+#     },
+# }
+
 
 # Database (using SQLite)
 DATABASES = {

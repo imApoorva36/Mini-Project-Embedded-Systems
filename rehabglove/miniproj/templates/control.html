@@ -1,3 +1,4 @@
+<!-- control.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,18 +52,18 @@
     <h3>Current Threshold: <span id="current-threshold">100</span></h3>
 
     <script>
-        // Replace this with the correct local IP address of your Django server
-        var ws = new WebSocket("ws://192.168.250.150:8000/ws/arduino/");
+        // Replace this with the ESP32 WebSocket server's IP
+        var ws = new WebSocket("ws://192.168.250.254:81"); 
 
         // Update WebSocket connection status
         ws.onopen = function() {
-            document.getElementById("status").textContent = "Connected to WebSocket!";
+            document.getElementById("status").textContent = "Connected to ESP32!";
             document.getElementById("status").classList.remove('disconnected');
             document.getElementById("status").classList.add('connected');
         };
 
         ws.onclose = function() {
-            document.getElementById("status").textContent = "Disconnected from WebSocket!";
+            document.getElementById("status").textContent = "Disconnected from ESP32!";
             document.getElementById("status").classList.remove('connected');
             document.getElementById("status").classList.add('disconnected');
         };
@@ -73,20 +74,15 @@
             document.getElementById("status").classList.add('disconnected');
         };
 
-        // Receive the threshold data from the WebSocket
-        ws.onmessage = function(event) {
-            var data = JSON.parse(event.data);
-            if (data.threshold) {
-                document.getElementById("current-threshold").textContent = data.threshold;
-            }
-        };
-
         // Send the updated threshold to the WebSocket
         function updateThreshold() {
             var thresholdValue = document.getElementById("threshold").value;
-            ws.send(JSON.stringify({
-                'threshold': thresholdValue
-            }));
+
+            // Send JSON string with the threshold update
+            ws.send(`threshold:${thresholdValue}`);
+
+            // Update current threshold display
+            document.getElementById("current-threshold").textContent = thresholdValue;
         }
     </script>
 </body>
