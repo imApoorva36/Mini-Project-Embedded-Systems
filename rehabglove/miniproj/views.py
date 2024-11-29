@@ -7,9 +7,6 @@ def control_page(request):
     return render(request, "control.html")
 
 
-from django.shortcuts import render, redirect
-
-
 # Simulated patient data
 patients = [
     {
